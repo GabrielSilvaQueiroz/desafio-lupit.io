@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo da tabela Team
+model Team {
+  id         Int       @id @default(autoincrement()) // ID único da equipe
+  name       String // Nome da equipe
+  created_at DateTime  @default(now()) // Data de criação da equipe
+  updated_at DateTime? @updatedAt // Data de última atualização da equipe
+  players    Player[] // Relacionamento indicando que uma equipe pode ter vários jogadores
+
+  @@map("teams") // Define o nome da tabela no banco de dados como "teams"
+}
+
+// Modelo da tabela Player
+model Player {
+  id         Int       @id @default(autoincrement()) // ID único do jogador
+  name       String // Nome do jogador
+  age        Int // Idade do jogador
+  team_id    Int // Chave estrangeira referenciando a tabela Team
+  team       Team      @relation(fields: [team_id], references: [id]) // Relacionamento indicando que um jogador pertence a uma equipe
+  created_at DateTime  @default(now()) // Data de criação do jogador
+  updated_at DateTime? @updatedAt // Data de última atualização do jogador
+
+  @@map("players") // Define o nome da tabela no banco de dados como "players"
+}
