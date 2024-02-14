@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, NotFoundException, HttpStatus, Res } from '@nestjs/common';
 import { PlayersService } from './players.service';
 import { Player } from '.prisma/client';
 
@@ -8,56 +8,68 @@ export class PlayersController {
 
   // Rota para buscar todos os jogadores
   @Get()
-  async findAll(): Promise<Player[] | { message: string }> {
+  async findAll(@Res() res): Promise<void> {
     try {
       const players = await this.playersService.findAll();
 
+      // Verifica se há jogadores encontrados
       if (players.length === 0) {
-        return { message: 'Nenhum jogador encontrado' }; // Retorna uma mensagem em JSON se nenhum jogador for encontrado
+        res.status(HttpStatus.NOT_FOUND).json({ message: 'Nenhum jogador encontrado' });
+      } else {
+        res.status(HttpStatus.OK).json(players);
       }
-
-      return players; // Retorna a lista de jogadores se houver algum
     } catch (error) {
-      return { message: 'Erro ao buscar jogadores' }; // Retorna uma mensagem de erro em JSON
+      // Se ocorrer um erro ao buscar jogadores
+      res.status(HttpStatus.BAD_REQUEST).json({ message: 'Erro ao buscar jogadores' });
     }
   }
 
   // Rota para criar um novo jogador
   @Post()
-  async create(@Body() createPlayerDto: { name: string, age: number, teamId: number }): Promise<Player | { message: string }> {
+  async create(@Body() createPlayerDto: { name: string, age: number, teamId: number }, @Res() res): Promise<void> {
     try {
       const player = await this.playersService.create(createPlayerDto);
-      return player; // Retorna o jogador criado
+      // Retorna o jogador criado com o código 201 Created
+      res.status(HttpStatus.CREATED).json(player);
     } catch (error) {
-      return { message: 'Erro ao criar o jogador' }; // Retorna uma mensagem de erro em JSON
+      // Se ocorrer um erro ao criar o jogador
+      res.status(HttpStatus.BAD_REQUEST).json({ message: 'Erro ao criar o jogador' });
     }
   }
 
   // Rota para atualizar um jogador pelo ID
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updatePlayerDto: { name: string, age: number, teamId?: number }): Promise<Player | { message: string }> {
+  async update(@Param('id') id: string, @Body() updatePlayerDto: { name: string, age: number, teamId?: number }, @Res() res): Promise<void> {
     try {
       const player = await this.playersService.update(+id, updatePlayerDto);
-      return player; // Retorna o jogador atualizado
+      // Retorna o jogador atualizado com o código 200 OK
+      res.status(HttpStatus.OK).json(player);
     } catch (error) {
+      // Se o ID for inválido
       if (error instanceof NotFoundException) {
-        return { message: 'ID inválido' }; // Retorna uma mensagem de erro em JSON
+        res.status(HttpStatus.NOT_FOUND).json({ message: 'ID inválido' });
+      } else {
+        // Se ocorrer um erro ao atualizar o jogador
+        res.status(HttpStatus.BAD_REQUEST).json({ message: 'Erro ao atualizar o jogador' });
       }
-      return { message: 'Erro ao atualizar o jogador' }; // Retorna uma mensagem de erro em JSON
     }
   }
 
   // Rota para deletar um jogador pelo ID
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<{ message: string }> {
+  async remove(@Param('id') id: string, @Res() res): Promise<void> {
     try {
       await this.playersService.remove(+id);
-      return { message: 'Jogador deletado com sucesso' }; // Retorna uma mensagem de sucesso em JSON
+      // Retorna a mensagem de sucesso com o código 200 OK
+      res.status(HttpStatus.OK).json({ message: 'Jogador deletado com sucesso' });
     } catch (error) {
+      // Se o ID for inválido
       if (error instanceof NotFoundException) {
-        return { message: 'ID inválido' }; // Retorna uma mensagem de erro em JSON
+        res.status(HttpStatus.NOT_FOUND).json({ message: 'ID inválido' });
+      } else {
+        // Se ocorrer um erro ao deletar o jogador
+        res.status(HttpStatus.BAD_REQUEST).json({ message: 'Erro ao deletar o jogador' });
       }
-      return { message: 'Erro ao deletar o jogador' }; // Retorna uma mensagem de erro em JSON
     }
   }
 }
