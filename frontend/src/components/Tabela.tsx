@@ -20,6 +20,12 @@ const TableContainer = styled.table`
   text-align: center;
 `;
 
+const Observacao = styled.p`
+text-align: center;
+justify-content: center;
+margin-top: 30px;
+`
+
 const Head = styled.thead`
   background-color: #f2f2f2;
 `;
@@ -93,6 +99,11 @@ const Table: React.FC<{ jogadores: any[]; setJogadores: React.Dispatch<React.Set
             }
         });
     };
+
+    // Verificar se há jogadores
+    if (jogadores.length === 0) {
+        return <Observacao>Não existe nenhum jogador cadastrado.</Observacao>;
+    }
 
 
     return (
