@@ -33,7 +33,7 @@ export class PlayersService {
     }
 
     // Atualiza um jogador pelo ID
-    async update(id: number, updatePlayerDto: { name: string, age: number }): Promise<Player> {
+    async update(id: number, updatePlayerDto: { name: string, age: number, teamId?: number }): Promise<Player> {
         const player = await this.prisma.player.findUnique({
             where: { id },
         });
@@ -47,6 +47,7 @@ export class PlayersService {
             data: {
                 name: updatePlayerDto.name,
                 age: updatePlayerDto.age,
+                team_id: updatePlayerDto.teamId,
                 updated_at: new Date(), // Atualiza a data de última atualização
             },
         });

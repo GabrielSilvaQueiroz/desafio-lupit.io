@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 const BotaoContainer = styled.button`
   background-color: #2196f3;
@@ -41,18 +42,29 @@ const TitleJogadores = styled.h1`
 `;
 
 const BotaoAdicionarJogador: React.FC<{ onClick: () => void }> = ({ onClick }) => {
-    return (
-        <>
-            <DivItems>
-                <TitleJogadores> Jogadores</TitleJogadores>
-                <div>
-                    <BotaoContainer onClick={onClick}> + Adicionar Jogador </BotaoContainer>
-                    <BotaoContainer onClick={onClick}> + Adicionar Time </BotaoContainer>
-                </div>
+  const router = useRouter();
 
-            </DivItems>
-        </>
-    );
+  return (
+    <>
+      <DivItems>
+        <TitleJogadores> Jogadores </TitleJogadores>
+        <div>
+          <BotaoContainer onClick={() => {
+            // Redireciona para a página jogadores/novo
+            router.push('/jogadores/novo');
+          }}>
+            + Adicionar Jogador
+          </BotaoContainer>
+          <BotaoContainer onClick={() => {
+            // Redireciona para a página times/novo
+            router.push('/times/novo');
+          }}>
+            + Adicionar Time
+          </BotaoContainer>
+        </div>
+      </DivItems>
+    </>
+  );
 };
 
 export default BotaoAdicionarJogador;
